@@ -3,29 +3,32 @@
 
 #include<iostream>
 #include<cstring>
+#include<vector>
 using namespace std;
 const int N=510,M=1e4+10;
 int n,m,k;
 int dist[N],backup[N];
 struct Edge
 {
-    int a,b,w;
-}edges[M];
-int bellman_ford()
-{
-    memset(dist,0x3f,sizeof dist);
-    dist[1]=0;
-    for(int i=0;i<k;i++)
-    {
-        memcpy(backup,dist,sizeof dist);
-        for(int j=0;j<m;j++)
-        {
-            int a=edges[j].a,b=edges[j].b,w=edges[j].w;
-            dist[b]=min(dist[b],backup[a]+w);
+    int v,w;
+};
+vector<Edge> e[N];
+bool bellman_ford() {
+    memset(dist, 0x3f, sizeof dist);
+    dist[1] = 0;
+    for (int i = 1; i <= k; i++) {
+        memcpy(backup, dist, sizeof dist);
+        for (int u = 1; u <= n; u++) {
+            if (backup[u] > 0x3f3f3f3f / 2) continue;
+            for (auto ed : e[u]) {
+                int v = ed.v, w = ed.w;
+                if (dist[v] > backup[u] + w) {
+                    dist[v] = backup[u] + w;
+                }
+            }
         }
     }
-    if(dist[n]>0x3f3f3f3f/2) return -1;
-    else return dist[n];
+    return dist[n]<0x3f3f3f3f/2;
 }
 int main()
 {
@@ -34,12 +37,11 @@ int main()
     {
         int a,b,w;
         scanf("%d%d%d",&a,&b,&w);
-        edges[i]={a,b,w};
+        e[a].push_back({b,w});
     }
-    int t=bellman_ford();
-    if(dist[n]<=0x3f3f3f3f/2)
+    if(bellman_ford())
     {
-        printf("%d",t);
+        printf("%d",dist[n]);
     }else{
         puts("impossible");
     }
